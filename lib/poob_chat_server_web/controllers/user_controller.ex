@@ -1,8 +1,10 @@
 defmodule PoobChatServerWeb.UserController do
   use PoobChatServerWeb, :controller
+  require Logger
 
   alias PoobChatServer.Accounts
   alias PoobChatServer.Accounts.User
+  alias PoobChatServer.Token
 
   action_fallback PoobChatServerWeb.FallbackController
 
@@ -11,11 +13,13 @@ defmodule PoobChatServerWeb.UserController do
     render(conn, "index.json", users: users)
   end
 
-  def create(conn, %{"user" => user_params}) do
-    with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
-      conn
-      |> put_status(:created)
-      |> render("show.json", user: user)
+  def create(conn, params = %{"username" => _username, "password" => _password}) do
+    with {:ok, %User{} = user} <- Accounts.create_user(params),
+         token <- Token.sign(%{user_id: user.id})
+    do
+        conn
+          |> put_status(:created)
+          |> render("registration.json", %{user: user, token: token})
     end
   end
 

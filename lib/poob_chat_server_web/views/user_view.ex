@@ -18,4 +18,16 @@ defmodule PoobChatServerWeb.UserView do
       push_token: user.push_token
     }
   end
+
+  def render("registration.json", %{user: user, token: token}) do
+    %{
+      user: %{
+        id: user.id,
+        username: user.username,
+        created_at: user.created_at,
+        push_token: user.push_token,
+      },
+     token: token
+    }
+  end
 end

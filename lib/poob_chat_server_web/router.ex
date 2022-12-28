@@ -5,9 +5,18 @@ defmodule PoobChatServerWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated do
+    plug PoobChatServer.Plug.Authenticate
+  end
+
+
   scope "/api", PoobChatServerWeb do
     pipe_through :api
+
+    post "/register", UserController, :create
+    post "/login", UserSessionController, :create
   end
+
 
   # Enables LiveDashboard only for development
   #

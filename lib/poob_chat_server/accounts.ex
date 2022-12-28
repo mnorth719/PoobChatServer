@@ -5,8 +5,29 @@ defmodule PoobChatServer.Accounts do
 
   import Ecto.Query, warn: false
   alias PoobChatServer.Repo
+  require Logger
 
   alias PoobChatServer.Accounts.User
+
+  ## User registration
+
+  @doc """
+  Registers a user.
+
+  ## Examples
+
+      iex> register_user(%{field: value})
+      {:ok, %User{}}
+
+      iex> register_user(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def register_user(attrs) do
+    %User{}
+    |> User.registration_changeset(attrs)
+    |> Repo.insert()
+  end
 
   @doc """
   Returns the list of users.
@@ -37,6 +58,15 @@ defmodule PoobChatServer.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+
+  def get_user_by_username_and_password(username, password)
+    when is_binary(username) and is_binary(password) do
+    user = Repo.get_by(User, username: username)
+    if User.valid_password?(user, password), do: user
+  end
+
+  @spec create_user(:invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}) ::
+          any
   @doc """
   Creates a user.
 
@@ -51,7 +81,7 @@ defmodule PoobChatServer.Accounts do
   """
   def create_user(attrs \\ %{}) do
     %User{}
-    |> User.changeset(attrs)
+    |> User.registration_changeset(attrs)
     |> Repo.insert()
   end
 
