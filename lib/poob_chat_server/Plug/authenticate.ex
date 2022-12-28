@@ -15,7 +15,7 @@ defmodule PoobChatServer.Plug.Authenticate do
       _error ->
         conn
         |> put_status(:unauthorized)
-        |> Phoenix.Controller.put_view(MyAppWeb.ErrorView)
+        |> Phoenix.Controller.put_view(PoobChatServerWeb.ErrorView)
         |> Phoenix.Controller.render(:"401")
         |> halt()
     end

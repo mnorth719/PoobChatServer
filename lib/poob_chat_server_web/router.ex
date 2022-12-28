@@ -9,12 +9,21 @@ defmodule PoobChatServerWeb.Router do
     plug PoobChatServer.Plug.Authenticate
   end
 
-
   scope "/api", PoobChatServerWeb do
     pipe_through :api
 
     post "/register", UserController, :create
     post "/login", UserSessionController, :create
+
+    pipe_through :authenticated
+
+    get "/message", MessageController, :show
+    post "/message", MessageController, :create
+    delete "/message", MessageController, :delete
+  end
+
+  scope "/api", PoobChatServerWeb do
+
   end
 
 
