@@ -32,9 +32,12 @@ defmodule PoobChatServer.Chat do
 
   """
   def list_messages(user_id) do
-    from(m in Message, where: m.sender_id == ^user_id or m.recipient_id == ^user_id)
-      |> order_by([m], m.timestamp)
-      |> Repo.all()
+    query = from(
+      m in Message,
+      where: m.sender_id == ^user_id or m.recipient_id == ^user_id,
+      order_by: [desc: m.timestamp]
+    )
+    Repo.all(query)
   end
 
   @doc """
