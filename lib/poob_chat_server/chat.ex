@@ -5,6 +5,7 @@ defmodule PoobChatServer.Chat do
 
   import Ecto.Query, warn: false
   require Logger
+  alias NaiveDateTime
   alias PoobChatServer.Repo
 
   alias PoobChatServer.Chat.Message
@@ -74,6 +75,20 @@ defmodule PoobChatServer.Chat do
     |> Repo.insert()
   end
 
+  def create_message_and_convo(attrs \\ %{}) do
+    convo_id = generated_conversation_id(attrs)
+    attrs = Map.put(attrs, "conversation_id", convo_id)
+    upsert_convo(convo_id,
+      %{
+        id: convo_id,
+        preview: Map.get(attrs, "content"),
+        unread_count: 0
+      }
+    )
+    Logger.log(:debug, IO.inspect(attrs))
+    create_message(attrs)
+  end
+
   @doc """
   Updates a message.
 
@@ -119,5 +134,116 @@ defmodule PoobChatServer.Chat do
   """
   def change_message(%Message{} = message, attrs \\ %{}) do
     Message.changeset(message, attrs)
+  end
+
+  alias PoobChatServer.Chat.Conversation
+
+  @doc """
+  Returns the list of conversations.
+
+  ## Examples
+
+      iex> list_conversations()
+      [%Conversation{}, ...]
+
+  """
+  def list_conversations do
+    Repo.all(Conversation)
+  end
+
+  @doc """
+  Gets a single conversation.
+
+  Raises `Ecto.NoResultsError` if the Conversation does not exist.
+
+  ## Examples
+
+      iex> get_conversation!(123)
+      %Conversation{}
+
+      iex> get_conversation!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_conversation!(id), do: Repo.get!(Conversation, id)
+
+  @doc """
+  Creates a conversation.
+
+  ## Examples
+
+      iex> create_conversation(%{field: value})
+      {:ok, %Conversation{}}
+
+      iex> create_conversation(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_conversation(attrs \\ %{}) do
+    %Conversation{}
+    |> Conversation.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def upsert_convo(id, attrs \\ %{}) do
+    case Repo.get(Conversation, id) do
+      %Conversation{} = conv -> update_conversation(conv, attrs)
+      _ -> create_conversation(attrs)
+    end
+  end
+
+  @doc """
+  Updates a conversation.
+
+  ## Examples
+
+      iex> update_conversation(conversation, %{field: new_value})
+      {:ok, %Conversation{}}
+
+      iex> update_conversation(conversation, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_conversation(%Conversation{} = conversation, attrs) do
+    conversation
+    |> Conversation.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a conversation.
+
+  ## Examples
+
+      iex> delete_conversation(conversation)
+      {:ok, %Conversation{}}
+
+      iex> delete_conversation(conversation)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_conversation(%Conversation{} = conversation) do
+    Repo.delete(conversation)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking conversation changes.
+
+  ## Examples
+
+      iex> change_conversation(conversation)
+      %Ecto.Changeset{data: %Conversation{}}
+
+  """
+  def change_conversation(%Conversation{} = conversation, attrs \\ %{}) do
+    Conversation.changeset(conversation, attrs)
+  end
+
+  def generated_conversation_id(%{"sender_id" => sid, "recipient_id" => rid}) do
+    raw_id = [sid, rid]
+            |> Enum.sort()
+            |> Enum.join()
+    :crypto.hash(:sha256, raw_id)
+      |> Base.encode16()
   end
 end

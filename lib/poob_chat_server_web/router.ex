@@ -20,6 +20,8 @@ defmodule PoobChatServerWeb.Router do
     get "/message", MessageController, :show
     post "/message", MessageController, :create
     delete "/message", MessageController, :delete
+
+    get "/conversation", ConversationController, :index
   end
 
   scope "/api", PoobChatServerWeb do

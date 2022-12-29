@@ -21,4 +21,20 @@ defmodule PoobChatServer.ChatFixtures do
 
     message
   end
+
+  @doc """
+  Generate a conversation.
+  """
+  def conversation_fixture(attrs \\ %{}) do
+    {:ok, conversation} =
+      attrs
+      |> Enum.into(%{
+        last_updated: ~N[2022-12-27 17:56:00],
+        preview: "some preview",
+        unread_count: 42
+      })
+      |> PoobChatServer.Chat.create_conversation()
+
+    conversation
+  end
 end

@@ -14,7 +14,7 @@ defmodule PoobChatServerWeb.MessageController do
   end
 
   def create(conn, %{"message" => message_params}) do
-    with {:ok, %Message{} = message} <- Chat.create_message(message_params) do
+    with {:ok, %Message{} = message} <- Chat.create_message_and_convo(message_params) do
       conn
       |> put_status(:created)
       |> render("show.json", message: message)
