@@ -77,6 +77,16 @@ defmodule PoobChatServer.Chat do
       {:error, %Ecto.Changeset{}}
 
   """
+
+  def get_messages_with_convo_id(id) do
+    query = from(
+      m in Message,
+      where: m.conversation_id == ^id,
+      order_by: [desc: m.timestamp]
+    )
+    Repo.all(query)
+  end
+
   def create_message(attrs \\ %{}) do
     %Message{}
     |> Message.changeset(attrs)

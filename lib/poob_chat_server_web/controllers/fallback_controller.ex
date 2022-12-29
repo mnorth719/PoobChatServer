@@ -20,6 +20,13 @@ defmodule PoobChatServerWeb.FallbackController do
     conn
     |> put_status(:not_found)
     |> put_view(PoobChatServerWeb.ErrorView)
-    |> render(:"404")
+    |> render("error.json")
+  end
+
+  def call(conn, {:error, _}) do
+    conn
+    |> put_status(:error_logger)
+    |> put_view(PoobChatServerWeb.ErrorView)
+    |> render("error.json")
   end
 end

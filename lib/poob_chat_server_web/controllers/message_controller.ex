@@ -26,6 +26,11 @@ defmodule PoobChatServerWeb.MessageController do
     render(conn, "show.json", message: message)
   end
 
+  def show(conn, %{"conversation_id" => id}) do
+    message = Chat.get_messages_with_convo_id(id)
+    render(conn, "messages.json", messages: message)
+  end
+
   def show(conn, %{}) do
     case conn.assigns[:current_user] do
       %User{} = user -> render(conn, "messages.json", messages: Chat.list_messages(user.id))
