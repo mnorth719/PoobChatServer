@@ -96,7 +96,6 @@ defmodule PoobChatServer.Chat do
   def create_message_and_convo(attrs \\ %{}) do
     convo_id = generated_conversation_id(attrs)
     attrs = Map.put(attrs, "conversation_id", convo_id)
-    create_message(attrs)
     case upsert_convo(convo_id,
       %{
         id: convo_id,
