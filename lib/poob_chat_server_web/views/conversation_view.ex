@@ -15,7 +15,6 @@ defmodule PoobChatServerWeb.ConversationView do
   end
 
   def render("conversation.json", %{conversation: conversation, user_id: user_id}) do
-    Logger.log(:debug, "Rendering convo")
     user = conversation.users
       |> Enum.filter(fn u -> u.id != user_id end)
       |> List.first("Unknown")
