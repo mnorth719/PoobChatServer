@@ -7,8 +7,8 @@ defmodule PoobChatServerWeb.ConversationController do
   action_fallback PoobChatServerWeb.FallbackController
 
   def index(conn, _params) do
-    conversations = Chat.list_conversations()
-    render(conn, "index.json", conversations: conversations)
+    user_id = conn.assigns[:current_user].id
+    render(conn, "index.json", conversations: Chat.list_convos(user_id), user_id: user_id)
   end
 
   def show(conn, %{"id" => id}) do

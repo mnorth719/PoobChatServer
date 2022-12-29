@@ -5,7 +5,6 @@ defmodule PoobChatServer.Chat do
 
   import Ecto.Query, warn: false
   require Logger
-  alias PoobChatServer.Accounts
   alias PoobChatServer.Accounts.User
   alias NaiveDateTime
   alias PoobChatServer.Repo
@@ -47,6 +46,7 @@ defmodule PoobChatServer.Chat do
     Repo.get(User, user_id)
       |> Ecto.assoc(:conversations)
       |> Repo.all()
+      |> Repo.preload([:users])
   end
 
   @doc """
