@@ -28,4 +28,8 @@ defmodule PoobChatServer.Chat.Message do
       _ -> changeset
     end
   end
+
+  def user_ids(%{"sender_id" => sid, "recipient_id" => rid}) do
+    [sid, rid]
+  end
 end

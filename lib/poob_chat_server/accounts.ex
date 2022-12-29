@@ -42,6 +42,11 @@ defmodule PoobChatServer.Accounts do
     Repo.all(User)
   end
 
+  def list_users(ids) do
+    from(u in User, where: u.id in ^ids)
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single user.
 

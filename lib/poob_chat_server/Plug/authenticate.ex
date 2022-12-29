@@ -7,6 +7,8 @@ defmodule PoobChatServer.Plug.Authenticate do
   end
 
   def call(conn, _opts) do
+    Logger.log(:debug, "authing")
+    Logger.log(:debug, get_req_header(conn, "authorization"))
     with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
          {:ok, data} <- PoobChatServer.Token.verify(token) do
       conn

@@ -9,7 +9,7 @@ import Config
 
 config :poob_chat_server,
   ecto_repos: [PoobChatServer.Repo],
-  generators: [binary_id: true]
+  generators: [binary_id: false]
 
 # Configures the endpoint
 config :poob_chat_server, PoobChatServerWeb.Endpoint,

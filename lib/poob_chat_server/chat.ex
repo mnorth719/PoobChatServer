@@ -5,6 +5,8 @@ defmodule PoobChatServer.Chat do
 
   import Ecto.Query, warn: false
   require Logger
+  alias PoobChatServer.Accounts
+  alias PoobChatServer.Accounts.User
   alias NaiveDateTime
   alias PoobChatServer.Repo
 
@@ -39,6 +41,12 @@ defmodule PoobChatServer.Chat do
       order_by: [desc: m.timestamp]
     )
     Repo.all(query)
+  end
+
+  def list_convos(user_id) do
+    Repo.get(User, user_id)
+      |> Ecto.assoc(:conversations)
+      |> Repo.all()
   end
 
   @doc """
@@ -78,14 +86,17 @@ defmodule PoobChatServer.Chat do
   def create_message_and_convo(attrs \\ %{}) do
     convo_id = generated_conversation_id(attrs)
     attrs = Map.put(attrs, "conversation_id", convo_id)
-    upsert_convo(convo_id,
+    create_message(attrs)
+    case upsert_convo(convo_id,
       %{
         id: convo_id,
         preview: Map.get(attrs, "content"),
         unread_count: 0
       }
-    )
-    Logger.log(:debug, IO.inspect(attrs))
+    ) do
+      {:ok, conv} -> upsert_user_conversations(conv, Message.user_ids(attrs))
+      _ -> raise "unable to associate convo"
+    end
     create_message(attrs)
   end
 
@@ -189,6 +200,25 @@ defmodule PoobChatServer.Chat do
     case Repo.get(Conversation, id) do
       %Conversation{} = conv -> update_conversation(conv, attrs)
       _ -> create_conversation(attrs)
+    end
+  end
+
+  def upsert_user_conversations(conversation, user_ids)
+    when is_list(user_ids) do
+    users =
+      User
+      |> where([u], u.id in ^user_ids)
+      |> Repo.all()
+    with {:ok, _struct} <-
+           conversation
+           |> Repo.preload([:users])
+           |> Conversation.changeset_update_users(users)
+           |> Repo.update()
+            do
+      {:ok, get_conversation!(conversation.id)}
+    else
+      error ->
+        error
     end
   end
 
