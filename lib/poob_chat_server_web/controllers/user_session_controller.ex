@@ -18,7 +18,7 @@ defmodule PoobChatServerWeb.UserSessionController do
   end
 
   defp finish_login(conn, %User{} = user) do
-    token = Token.sign(%{userId: user.id})
+    token = Token.sign(%{user_id: user.id})
     conn
       |> put_view(PoobChatServerWeb.UserView)
       |> put_status(:created)

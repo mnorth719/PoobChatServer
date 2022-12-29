@@ -1,17 +1,20 @@
 defmodule PoobChatServer.Accounts.User do
+  alias PoobChatServer.Chat.Conversation
   use Ecto.Schema
   import Ecto.Changeset
+  require Logger
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
+  @primary_key {:id, :string, []}
+  @foreign_key_type :string
   schema "users" do
     field :created_at, :naive_datetime
     field :hashed_password, :string, redact: true
     field :password, :string, virtual: true, redact: true
     field :push_token, :string
     field :username, :string
-
     timestamps()
+
+    many_to_many :conversations, Conversation, join_through: "users_conversations"
   end
 
   @doc """
@@ -33,18 +36,21 @@ defmodule PoobChatServer.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :password, :hashed_password, :created_at, :push_token])
-    |> validate_required([:username, :password, :hashed_password, :created_at])
+    |> cast(attrs, [:username, :password, :hashed_password, :created_at, :push_token, :id])
+    |> validate_required([:username, :password, :hashed_password, :created_at, :id])
   end
 
   def registration_changeset(user, attrs, opts \\ []) do
+    attrs = id_if_missing(attrs)
     user
-    |> cast(attrs, [:username, :password])
+    |> cast(attrs, [:username, :password, :id])
+    |> id_if_missing()
     |> validate_username()
     |> validate_password(opts)
   end
 
   defp validate_username(changeset) do
+    Logger.log(:debug, IO.inspect(changeset))
     changeset
     |> validate_required([:username])
     |> validate_length(:username, max: 40)
@@ -74,6 +80,13 @@ defmodule PoobChatServer.Accounts.User do
       |> delete_change(:password)
     else
       changeset
+    end
+  end
+
+  defp id_if_missing(attrs) do
+    case Map.get(attrs, "id") do
+      nil -> Map.put(attrs, "id", UUID.uuid1())
+      _ -> attrs
     end
   end
 end
