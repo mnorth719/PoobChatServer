@@ -3,14 +3,13 @@ defmodule PoobChatServerWeb.FriendController do
   require Logger
 
   alias PoobChatServer.Accounts
-  alias PoobChatServer.Accounts.Friend
 
   action_fallback PoobChatServerWeb.FallbackController
 
   def index(conn, _params) do
-    # user_id = conn.assigns[:current_user].id
-    # friends = Accounts.list_friends(user_id)
-    friends = Accounts.list_users()
+    user_id = conn.assigns[:current_user].id
+    friends = Accounts.list_friends(user_id)
+    # friends = Accounts.list_users()
     render(conn, "index.json", friends: friends)
   end
 
@@ -30,7 +29,6 @@ defmodule PoobChatServerWeb.FriendController do
 
   defp friend_created(conn) do
     conn
-    |> put_status(:created)
-    |> send_resp(:no_content, "")
+    |> send_resp(:created, "")
   end
 end

@@ -8,6 +8,7 @@ defmodule PoobChatServer.Accounts do
   require Logger
 
   alias PoobChatServer.Accounts.User
+  alias PoobChatServer.Accounts.Friend
 
   ## User registration
 
@@ -231,5 +232,23 @@ defmodule PoobChatServer.Accounts do
   """
   def change_user_token(%UserToken{} = user_token, attrs \\ %{}) do
     UserToken.changeset(user_token, attrs)
+  end
+
+  # Friends
+  def list_friends(user_id) do
+    # preloads = [:friends, :reverse_friends]
+    user = from(u in User,
+      where: u.id == ^user_id,
+      preload: [:friends, :reverse_friends]
+    )
+      |> Repo.one!()
+    user.friends ++ user.reverse_friends
+  end
+
+  def add_friend(user_id, friend_id) do
+    attrs = %{friend_id: friend_id, user_id: user_id}
+    %Friend{}
+      |> Friend.changeset(attrs)
+      |> Repo.insert()
   end
 end

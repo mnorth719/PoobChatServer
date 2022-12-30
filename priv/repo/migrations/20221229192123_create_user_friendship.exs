@@ -2,7 +2,7 @@ defmodule PoobChatServer.Repo.Migrations.CreateUserFriendship do
   use Ecto.Migration
 
   def change do
-    create table(:friends, primary_key: false) do
+    create table(:friends) do
       add :user_id, references(:users, type: :string)
       add :friend_id, references(:users, type: :string)
       timestamps()

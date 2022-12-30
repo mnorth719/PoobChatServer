@@ -1,5 +1,4 @@
 defmodule PoobChatServer.Accounts.User do
-  alias PoobChatServer.Accounts.Friend
   alias PoobChatServer.Chat.Conversation
   use Ecto.Schema
   import Ecto.Changeset
@@ -20,13 +19,13 @@ defmodule PoobChatServer.Accounts.User do
                  join_through: "users_conversations"
 
     many_to_many :friends,
-                 User,
-                 join_through: Friend,
+                 PoobChatServer.Accounts.User,
+                 join_through: PoobChatServer.Accounts.Friend,
                  join_keys: [user_id: :id, friend_id: :id]
 
     many_to_many :reverse_friends,
-                 User,
-                 join_through: Friend,
+                 PoobChatServer.Accounts.User,
+                 join_through: PoobChatServer.Accounts.Friend,
                  join_keys: [friend_id: :id, user_id: :id]
   end
 
@@ -46,7 +45,6 @@ defmodule PoobChatServer.Accounts.User do
     false
   end
 
-  @doc false
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:username, :password, :hashed_password, :created_at, :push_token, :id])
