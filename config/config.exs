@@ -13,10 +13,8 @@ config :poob_chat_server,
 
 # Configures the endpoint
 config :poob_chat_server, PoobChatServerWeb.Endpoint,
-  url: [host: "localhost"],
   render_errors: [view: PoobChatServerWeb.ErrorView, accepts: ~w(json), layout: false],
-  pubsub_server: PoobChatServer.PubSub,
-  live_view: [signing_salt: "0Z9p5jTu"]
+  pubsub_server: PoobChatServer.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,

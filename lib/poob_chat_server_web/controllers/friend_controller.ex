@@ -40,9 +40,4 @@ defmodule PoobChatServerWeb.FriendController do
       |> put_view(PoobChatServerWeb.ErrorView)
       |> put_status(error)
   end
-
-  defp friend_created(conn, friend) do
-    conn
-    |> send_resp(:created, "")
-  end
 end
