@@ -16,7 +16,21 @@ defmodule PoobChatServerWeb.FriendController do
   def create(conn, %{"id" => id}) do
     user_id = conn.assigns[:current_user].id
     case Accounts.add_friend(user_id, id) do
-      {:ok, _ } -> friend_created(conn)
+      {:ok, friend } -> render(conn, "friend.json", friend: friend)
+      {:error, err} -> error(conn, err)
+    end
+  end
+
+  def create(conn, %{"username" => un}) do
+    user_id = conn.assigns[:current_user].id
+    friend = Accounts.add_friend_by_username(user_id, un)
+    render(conn, "friend.json", friend: friend)
+  end
+
+  def delete(conn, %{"id" => id}) do
+    user_id = conn.assigns[:current_user].id
+    case Accounts.delete_friend(user_id, id) do
+      {1, _} -> send_resp(conn, :no_content, "")
       {:error, err} -> error(conn, err)
     end
   end
@@ -27,7 +41,7 @@ defmodule PoobChatServerWeb.FriendController do
       |> put_status(error)
   end
 
-  defp friend_created(conn) do
+  defp friend_created(conn, friend) do
     conn
     |> send_resp(:created, "")
   end

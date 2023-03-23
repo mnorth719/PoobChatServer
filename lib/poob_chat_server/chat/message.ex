@@ -49,4 +49,8 @@ defmodule PoobChatServer.Chat.Message do
   def user_ids(%{"sender_id" => sid, "recipient_id" => rid}) do
     [sid, rid]
   end
+
+  def validate_participants(%{"sender_id" => sid, "recipient_id" => rid}) do
+    sid != rid
+  end
 end

@@ -251,4 +251,25 @@ defmodule PoobChatServer.Accounts do
       |> Friend.changeset(attrs)
       |> Repo.insert()
   end
+
+  def add_friend_by_username(user_id, username) do
+    friend = Repo.get_by(User, username: username)
+    attrs = %{friend_id: friend.id, user_id: user_id}
+    %Friend{}
+      |> Friend.changeset(attrs)
+      |> Repo.insert()
+    friend
+  end
+
+
+  def delete_friend(user_id, friend_id) do
+    query_friend(user_id, friend_id)
+    |> Repo.delete_all()
+  end
+
+  defp query_friend(user_id, friend_id) do
+    from(f in Friend)
+      |> where([f], f.friend_id == ^friend_id)
+      |> where([f], f.user_id == ^user_id)
+  end
 end

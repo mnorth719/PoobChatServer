@@ -25,12 +25,8 @@ defmodule PoobChatServerWeb.Router do
 
     get "/friend", FriendController, :index
     post "/friend", FriendController, :create
+    delete "/friend", FriendController, :delete
   end
-
-  scope "/api", PoobChatServerWeb do
-
-  end
-
 
   # Enables LiveDashboard only for development
   #

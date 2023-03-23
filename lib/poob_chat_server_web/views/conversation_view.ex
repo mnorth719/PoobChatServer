@@ -17,13 +17,17 @@ defmodule PoobChatServerWeb.ConversationView do
   def render("conversation.json", %{conversation: conversation, user_id: user_id}) do
     user = conversation.users
       |> Enum.filter(fn u -> u.id != user_id end)
-      |> List.first("Unknown")
+      |> List.first()
+    if user === nil do
+      Logger.log(:debug, conversation.id)
+    end
     %{
       id: conversation.id,
       preview: conversation.preview,
       unread_count: conversation.unread_count,
       updated_at: DateFormatter.naive_to_iso_string(conversation.updated_at),
-      username: user.username
+      username: user.username,
+      recipient_id: user.id
     }
   end
 end
